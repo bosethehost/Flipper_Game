@@ -1,0 +1,29 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+.env/
+.env.*
+
+# Git
+.git/
+.gitignore
+
+# Editor / OS files
+.vscode/
+.idea/
+.DS_Store
+
+# Docker artifacts
+Dockerfile
+.dockerignore
+
+# Logs
+*.log
+
+# Node / frontend (if repo root is copied)
+node_modules/
+frontend/
