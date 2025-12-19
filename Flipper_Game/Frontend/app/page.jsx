@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+const API = process.env.NEXT_PUBLIC_API_URL;
+
 export default function Page() {
   const [objectType, setObjectType] = useState("sandwich");
   const [guess, setGuess] = useState("");
@@ -10,7 +12,7 @@ export default function Page() {
   const [leaderboard, setLeaderboard] = useState([]);
 
   const play = async () => {
-    const res = await fetch("http://localhost:8000/toss", {
+    const res = await fetch(`${API}/toss`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -26,7 +28,7 @@ export default function Page() {
   };
 
   const loadLeaderboard = async () => {
-    const res = await fetch("http://localhost:8000/leaderboard");
+    const res = await fetch(`${API}/leaderboard`);
     const data = await res.json();
     setLeaderboard(data);
   };
@@ -71,6 +73,3 @@ export default function Page() {
     </main>
   );
 }
-
-
-
