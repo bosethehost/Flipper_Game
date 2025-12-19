@@ -37,4 +37,8 @@ def play(req: TossRequest):
 
 @app.get("/leaderboard")
 def leaderboard():
-    return r.zrevrange("leaderboard", 0, 9, withscores=True)
+    raw = r.zrevrange("leaderboard", 0, 9, withscores=True)
+    return [
+        {"player": player.decode("utf-8"), "score": int(score)}
+        for player, score in raw
+    ]
