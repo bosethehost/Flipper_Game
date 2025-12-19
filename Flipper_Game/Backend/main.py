@@ -20,7 +20,10 @@ class TossRequest(BaseModel):
 
 @app.post("/toss")
 def play(req: TossRequest):
-    result = toss(req.object_type)
+    try:
+        result = toss(req.object_type)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     correct = False
     if isinstance(result, dict):
         correct = req.guess.lower() in str(result).lower()
