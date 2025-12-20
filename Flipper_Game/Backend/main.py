@@ -42,7 +42,10 @@ def play(req: TossRequest):
 
 
     if correct:
-        r.zincrby("leaderboard", 1, req.player)
+        try:
+            r.zincrby("leaderboard", 1, req.player)
+        except Exception as e:
+            print("Redis write failed:", e)
 
 
     return {"result": result, "correct": correct}
@@ -50,12 +53,13 @@ def play(req: TossRequest):
 
 @app.get("/leaderboard")
 def leaderboard():
-    raw = r.zrevrange("leaderboard", 0, 9, withscores=True)
-    return [
-        {"player": player.decode("utf-8"), "score": int(score)}
-        for player, score in raw
-    ]
-
+    try:
+        raw = r.zrevrange("leaderboard", 0, 9, withscores=True)
+        return [{"player": p, "score": int(s)} for p, s in raw]
+    except Exception as e:
+        print("Redis read failed:", e)
+        return []
+        
 @app.get("/ping")
 def ping():
     try:
