@@ -10,27 +10,43 @@ export default function Page() {
   const [player, setPlayer] = useState("");
   const [result, setResult] = useState(null);
   const [leaderboard, setLeaderboard] = useState([]);
+  const [error, setError] = useState("");
 
   const play = async () => {
-    const res = await fetch(`${API}/toss`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        object_type: objectType,
-        guess,
-        player,
-      }),
-    });
+    setError("");
+    try {
+      const res = await fetch(`${API}/toss`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          object_type: objectType,
+          guess,
+          player,
+        }),
+      });
 
-    const data = await res.json();
-    setResult(data);
-    loadLeaderboard();
+      if (!res.ok) {
+        throw new Error("Toss failed");
+      }
+
+      const data = await res.json();
+      setResult(data);
+      loadLeaderboard();
+    } catch (err) {
+      setError("❌ Could not reach the game server");
+    }
   };
 
   const loadLeaderboard = async () => {
-    const res = await fetch(`${API}/leaderboard`);
-    const data = await res.json();
-    setLeaderboard(data);
+    try {
+      const res = await fetch(`${API}/leaderboard`);
+      if (!res.ok) return;
+
+      const data = await res.json();
+      setLeaderboard(data);
+    } catch {
+      // silently ignore leaderboard errors
+    }
   };
 
   return (
@@ -43,31 +59,43 @@ export default function Page() {
         onChange={(e) => setPlayer(e.target.value)}
       />
 
-      <select value={objectType} onChange={(e) => setObjectType(e.target.value)}>
+      <select
+        value={objectType}
+        onChange={(e) => setObjectType(e.target.value)}
+      >
         <option value="sandwich">Sandwich</option>
         <option value="shoe">Shoe</option>
         <option value="jointed">Jointed</option>
       </select>
 
       <input
-        placeholder="Your guess"
+        placeholder="Your guess (e.g. Jam Side Up)"
         value={guess}
         onChange={(e) => setGuess(e.target.value)}
       />
 
       <button onClick={play}>Toss!</button>
 
+      {error && <p style={{ color: "red" }}>{error}</p>}
+
       {result && (
         <div className="result">
-          <p><strong>Result:</strong> {JSON.stringify(result.result)}</p>
+          <p>
+            <strong>Result:</strong>{" "}
+            {typeof result.result === "object"
+              ? JSON.stringify(result.result)
+              : result.result}
+          </p>
           <p>{result.correct ? "✅ Correct!" : "❌ Wrong"}</p>
         </div>
       )}
 
       <h2>🏆 Leaderboard</h2>
       <ul>
-        {leaderboard.map(([name, score]) => (
-          <li key={name}>{name}: {score}</li>
+        {leaderboard.map((entry) => (
+          <li key={entry.player}>
+            {entry.player}: {entry.score}
+          </li>
         ))}
       </ul>
     </main>
