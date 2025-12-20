@@ -15,7 +15,11 @@ app.add_middleware(
     allow_headers=["*"],  # <-- REQUIRED
 )
 
-r = redis.from_url(os.getenv("REDIS_URL"))
+r = redis.from_url(
+    os.getenv("REDIS_URL"),
+    decode_responses=True,
+    ssl=True,
+)
 
 
 class TossRequest(BaseModel):
