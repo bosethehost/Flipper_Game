@@ -45,3 +45,12 @@ def leaderboard():
         {"player": player.decode("utf-8"), "score": int(score)}
         for player, score in raw
     ]
+
+@app.get("/ping")
+def ping():
+    try:
+        r.set("ping", "pong")
+        val = r.get("ping")
+        return {"redis": val.decode("utf-8")}
+    except Exception as e:
+        return {"error": str(e)}
