@@ -7,7 +7,13 @@ from game import toss
 
 app = FastAPI(title="Flipper Game API")
 
-app.add_middleware(CORSMiddleware,allow_origins=["*"])
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # or your Vercel domain
+    allow_credentials=True,
+    allow_methods=["*"],  # <-- REQUIRED
+    allow_headers=["*"],  # <-- REQUIRED
+)
 
 r = redis.from_url(os.getenv("REDIS_URL"))
 
